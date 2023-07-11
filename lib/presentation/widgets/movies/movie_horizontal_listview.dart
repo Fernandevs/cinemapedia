@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 
 import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
+import 'package:go_router/go_router.dart';
 
 class MovieHorizontalListview extends StatefulWidget {
   final List<Movie> movies;
@@ -11,12 +12,13 @@ class MovieHorizontalListview extends StatefulWidget {
   final String? subTitle;
   final VoidCallback? loadNextPage;
 
-  const MovieHorizontalListview(
-      {super.key,
-      required this.movies,
-      this.title,
-      this.subTitle,
-      this.loadNextPage});
+  const MovieHorizontalListview({
+    super.key,
+    required this.movies,
+    this.title,
+    this.subTitle,
+    this.loadNextPage,
+  });
 
   @override
   State<MovieHorizontalListview> createState() =>
@@ -55,15 +57,16 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
           if (widget.title != null || widget.subTitle != null)
             _Title(title: widget.title, subTitle: widget.subTitle),
           Expanded(
-              child: ListView.builder(
-            controller: scrollController,
-            itemCount: widget.movies.length,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              return FadeInRight(child: _Slide(movie: widget.movies[index]));
-            },
-          ))
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: widget.movies.length,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, index) => FadeInRight(
+                child: _Slide(movie: widget.movies[index]),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -98,17 +101,19 @@ class _Slide extends StatelessWidget {
                     return const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     );
                   }
-                  return FadeIn(child: child);
+                  return GestureDetector(
+                    onTap: () => context.push('/movie/${movie.id}'),
+                    child: FadeIn(child: child),
+                  );
                 },
               ),
             ),
           ),
-
           const SizedBox(height: 5),
-
           //* Title
           SizedBox(
             width: 150,
@@ -118,7 +123,6 @@ class _Slide extends StatelessWidget {
               style: textStyles.titleSmall,
             ),
           ),
-
           //* Rating
           SizedBox(
             width: 150,
@@ -126,12 +130,16 @@ class _Slide extends StatelessWidget {
               children: [
                 Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
                 const SizedBox(width: 3),
-                Text('${movie.voteAverage}',
-                    style: textStyles.bodyMedium
-                        ?.copyWith(color: Colors.yellow.shade800)),
+                Text(
+                  '${movie.voteAverage}',
+                  style: textStyles.bodyMedium
+                      ?.copyWith(color: Colors.yellow.shade800),
+                ),
                 const Spacer(),
-                Text(HumanFormats.number(movie.popularity),
-                    style: textStyles.bodySmall),
+                Text(
+                  HumanFormats.number(movie.popularity),
+                  style: textStyles.bodySmall,
+                ),
               ],
             ),
           )
@@ -160,9 +168,10 @@ class _Title extends StatelessWidget {
           const Spacer(),
           if (subTitle != null)
             FilledButton.tonal(
-                style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                onPressed: () {},
-                child: Text(subTitle!))
+              style: const ButtonStyle(visualDensity: VisualDensity.compact),
+              onPressed: () {},
+              child: Text(subTitle!),
+            ),
         ],
       ),
     );

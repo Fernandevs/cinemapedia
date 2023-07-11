@@ -1,7 +1,9 @@
-import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
-import 'package:cinemapedia/presentation/widgets/widgets.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:cinemapedia/presentation/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   static const name = 'home-screen';
@@ -54,42 +56,43 @@ class _HomeViewState extends ConsumerState<_HomeView> {
         ),
       ),
       SliverList(
-          delegate: SliverChildBuilderDelegate((context, index) {
-        return Column(
-          children: [
-            MoviesSlideshow(movies: slideShowMovies),
-            MovieHorizontalListview(
-              movies: nowPlayingMovies,
-              title: 'En cines',
-              subTitle: 'Lunes 20',
-              loadNextPage: () =>
-                  ref.read(nowPlayingMoviesProvider.notifier).loadNextPage(),
-            ),
-            MovieHorizontalListview(
-              movies: upcomingMovies,
-              title: 'Próximamente',
-              subTitle: 'En este mes',
-              loadNextPage: () =>
-                  ref.read(upcomingMoviesProvider.notifier).loadNextPage(),
-            ),
-            MovieHorizontalListview(
-              movies: popularMovies,
-              title: 'Populares',
-              // subTitle: '',
-              loadNextPage: () =>
-                  ref.read(popularMoviesProvider.notifier).loadNextPage(),
-            ),
-            MovieHorizontalListview(
-              movies: topRatedMovies,
-              title: 'Mejor calificadas',
-              subTitle: 'Desde siempre',
-              loadNextPage: () =>
-                  ref.read(topRatedMoviesProvider.notifier).loadNextPage(),
-            ),
-            const SizedBox(height: 10),
-          ],
-        );
-      }, childCount: 1)),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return Column(
+            children: [
+              MoviesSlideshow(movies: slideShowMovies),
+              MovieHorizontalListview(
+                movies: nowPlayingMovies,
+                title: 'En cines',
+                subTitle: 'Lunes 20',
+                loadNextPage: () =>
+                    ref.read(nowPlayingMoviesProvider.notifier).loadNextPage(),
+              ),
+              MovieHorizontalListview(
+                movies: upcomingMovies,
+                title: 'Próximamente',
+                subTitle: 'En este mes',
+                loadNextPage: () =>
+                    ref.read(upcomingMoviesProvider.notifier).loadNextPage(),
+              ),
+              MovieHorizontalListview(
+                movies: popularMovies,
+                title: 'Populares',
+                // subTitle: '',
+                loadNextPage: () =>
+                    ref.read(popularMoviesProvider.notifier).loadNextPage(),
+              ),
+              MovieHorizontalListview(
+                movies: topRatedMovies,
+                title: 'Mejor calificadas',
+                subTitle: 'Desde siempre',
+                loadNextPage: () =>
+                    ref.read(topRatedMoviesProvider.notifier).loadNextPage(),
+              ),
+              const SizedBox(height: 10),
+            ],
+          );
+        }, childCount: 1),
+      ),
     ]);
   }
 }

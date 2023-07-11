@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:cinemapedia/config/constants/environment.dart';
 import 'package:cinemapedia/config/router/app_router.dart';
 import 'package:cinemapedia/config/theme/app_theme.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: '.env');
+  await Environment.initEnvironment();
+
+  HttpOverrides.global = _CinemapediaHttpOverrides();
 
   runApp(const ProviderScope(child: MainApp()));
 }
@@ -23,4 +27,15 @@ class MainApp extends StatelessWidget {
       theme: AppTheme.theme,
     );
   }
+}
+
+class _CinemapediaHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) =>
+      super.createHttpClient(context)
+        ..badCertificateCallback = (
+          X509Certificate cert,
+          String host,
+          int port,
+        ) => true;
 }
