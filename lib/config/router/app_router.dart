@@ -3,11 +3,18 @@ import 'package:cinemapedia/presentation/screens/screens.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
-  routes: <GoRoute>[
+  routes: [
     GoRoute(
       path: '/',
       name: HomeScreen.name,
       builder: (context, state) => const HomeScreen(),
-    )
+    ),
+    GoRoute(
+      path: '/movie/:id',
+      name: MovieScreen.name,
+      builder: (context, state) {
+        return const MovieScreen(id: '123',);
+      },
+    ),
   ],
 );
