@@ -1,12 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:cinemapedia/config/constants/environment.dart';
-import 'package:cinemapedia/config/router/app_router.dart';
-import 'package:cinemapedia/config/theme/app_theme.dart';
+import 'package:cinemapedia/config/config.dart'
+    show appRouter, AppTheme, Environment;
 
 Future<void> main() async {
   await Environment.initEnvironment();
@@ -37,5 +33,6 @@ class _CinemapediaHttpOverrides extends HttpOverrides {
           X509Certificate cert,
           String host,
           int port,
-        ) => true;
+        ) =>
+            true;
 }
