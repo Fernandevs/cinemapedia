@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 
 import 'package:cinemapedia/config/constants/environment.dart';
-import 'package:cinemapedia/domain/datasources/movies_datasource.dart';
-import 'package:cinemapedia/domain/entities/movie.dart';
-import 'package:cinemapedia/infrastructure/mappers/movie_mapper.dart';
-import 'package:cinemapedia/infrastructure/models/models.dart';
+import 'package:cinemapedia/domain/domain.dart' show Movie, MoviesDatasource;
+import 'package:cinemapedia/infrastructure/infrastructure.dart'
+    show MovieDBResponse, MovieDetails, MovieMapper;
 
 class MovieDBDatasource extends MoviesDatasource {
   final dio = Dio(
@@ -84,6 +83,8 @@ class MovieDBDatasource extends MoviesDatasource {
 
   @override
   Future<List<Movie>> searchMovies(String query) async {
+    if (query.isEmpty) return [];
+
     final response = await dio.get(
       '/search/movie',
       queryParameters: {'query': query},
