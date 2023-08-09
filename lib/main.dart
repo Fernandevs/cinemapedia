@@ -1,13 +1,19 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cinemapedia/config/config.dart'
-    show appRouter, AppTheme, Environment;
+import 'package:intl/date_symbol_data_local.dart';
+
+import 'package:cinemapedia/config/router/app_router.dart';
+import 'package:cinemapedia/config/theme/app_theme.dart';
 
 Future<void> main() async {
-  await Environment.initEnvironment();
+  FlutterNativeSplash.preserve(
+    widgetsBinding: WidgetsFlutterBinding.ensureInitialized(),
+  );
 
-  HttpOverrides.global = _CinemapediaHttpOverrides();
+  await dotenv.load(fileName: '.env');
 
   runApp(const ProviderScope(child: MainApp()));
 }
@@ -17,22 +23,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting();
+
     return MaterialApp.router(
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
     );
   }
-}
-
-class _CinemapediaHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) =>
-      super.createHttpClient(context)
-        ..badCertificateCallback = (
-          X509Certificate cert,
-          String host,
-          int port,
-        ) =>
-            true;
 }

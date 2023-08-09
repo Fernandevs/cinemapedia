@@ -1,50 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+
 class CustomBottomNavigation extends StatelessWidget {
+
   final int currentIndex;
 
   const CustomBottomNavigation({
-    super.key,
-    required this.currentIndex,
+    super.key, 
+    required this.currentIndex
   });
 
-  void _onItemTapped(BuildContext context, int currentIndex) {
-    switch (currentIndex) {
+  void onItemTapped( BuildContext context, int index ) {
+    // context.go('');
+    switch(index) {
       case 0:
         context.go('/home/0');
         break;
+      
       case 1:
         context.go('/home/1');
         break;
+
       case 2:
         context.go('/home/2');
         break;
-      default:
-        context.go('/home/0');
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+
+    final colors = Theme.of(context).colorScheme;
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      onTap: (value) => _onItemTapped(context, value),
+      onTap: (value) => onItemTapped(context, value),
       elevation: 0,
-      items: const <BottomNavigationBarItem>[
+      selectedItemColor: colors.primary,
+      items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: 'Inicio',
+          icon: Icon( Icons.home_max ),
+          label: 'Inicio'
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.label_outline),
-          label: 'Categorías',
+          icon: Icon( Icons.thumbs_up_down_outlined ),
+          label: 'Populares'
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite_outline),
-          label: 'Favoritos',
+          icon: Icon( Icons.favorite_outline ),
+          label: 'Favoritos'
         ),
-      ],
+      ]
     );
   }
 }

@@ -1,26 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cinemapedia/presentation/presentation.dart'
-    show
-        CustomAppbar,
-        initialLoadingProvider,
-        moviesSlideshowProvider,
-        nowPlayingMoviesProvider,
-        popularMoviesProvider,
-        topRatedMoviesProvider,
-        upcomingMoviesProvider,
-        FullScreenLoader,
-        MovieHorizontalListview,
-        MoviesSlideshow;
+
+import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:cinemapedia/presentation/widgets/widgets.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  ConsumerState createState() => _HomeViewState();
+  HomeViewState createState() => HomeViewState();
 }
 
-class _HomeViewState extends ConsumerState<HomeView> {
+class HomeViewState extends ConsumerState<HomeView>
+    with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
@@ -33,38 +26,35 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     final initialLoading = ref.watch(initialLoadingProvider);
-    if (initialLoading) {
-      return const FullScreenLoader(
-        messages: <String>[
-          'Cargando películas',
-          'Comprando palomitas de maíz',
-          'Cargando populares',
-          'Llamando a mi novia',
-          'Ya mero...',
-          'Esto está tardando más de lo esperado :(',
-        ],
-      );
-    }
+
+    if (initialLoading) return const FullScreenLoader();
+
+    FlutterNativeSplash.remove();
 
     final slideShowMovies = ref.watch(moviesSlideshowProvider);
     final nowPlayingMovies = ref.watch(nowPlayingMoviesProvider);
-    final popularMovies = ref.watch(popularMoviesProvider);
     final topRatedMovies = ref.watch(topRatedMoviesProvider);
     final upcomingMovies = ref.watch(upcomingMoviesProvider);
 
-    return CustomScrollView(slivers: [
-      const SliverAppBar(
-        floating: true,
-        flexibleSpace: FlexibleSpaceBar(
-          title: CustomAppbar(),
+    return CustomScrollView(
+      slivers: [
+        const SliverAppBar(
+          floating: true,
+          flexibleSpace: FlexibleSpaceBar(
+            title: CustomAppbar(),
+          ),
         ),
-      ),
-      SliverList(
-        delegate: SliverChildBuilderDelegate((context, index) {
+        SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
           return Column(
-            children: <Widget>[
+            children: [
+              // const CustomAppbar(),
+
               MoviesSlideshow(movies: slideShowMovies),
+
               MovieHorizontalListview(
                 movies: nowPlayingMovies,
                 title: 'En cines',
@@ -79,13 +69,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 loadNextPage: () =>
                     ref.read(upcomingMoviesProvider.notifier).loadNextPage(),
               ),
-              MovieHorizontalListview(
-                movies: popularMovies,
-                title: 'Populares',
-                // subTitle: '',
-                loadNextPage: () =>
-                    ref.read(popularMoviesProvider.notifier).loadNextPage(),
-              ),
+              //* Ya no estará aquí, ahora es parte del menú inferior
+              // MovieHorizontalListview(
+              //   movies: popularMovies,
+              //   title: 'Populares',
+              //   // subTitle: '',
+              //   loadNextPage: () =>ref.read(popularMoviesProvider.notifier).loadNextPage()
+              // ),
               MovieHorizontalListview(
                 movies: topRatedMovies,
                 title: 'Mejor calificadas',
@@ -96,8 +86,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
               const SizedBox(height: 10),
             ],
           );
-        }, childCount: 1),
-      ),
-    ]);
+        }, childCount: 1)),
+      ],
+    );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

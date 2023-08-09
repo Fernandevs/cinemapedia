@@ -1,4 +1,4 @@
-import 'package:cinemapedia/domain/domain.dart' show Actor;
+import 'package:cinemapedia/domain/entities/actor.dart';
 import 'package:cinemapedia/infrastructure/models/moviedb/cast_response.dart';
 
 class ActorMapper {
@@ -7,7 +7,7 @@ class ActorMapper {
         name: cast.name,
         profilePath: cast.profilePath != null
             ? 'https://image.tmdb.org/t/p/w500${cast.profilePath}'
-            : 'https://icon-library.com/images/no-profile-picture-icon/no-profile-picture-icon-14.jpg',
+            : 'https://st3.depositphotos.com/4111759/13425/v/600/depositphotos_134255710-stock-illustration-avatar-vector-male-profile-gray.jpg',
         character: cast.character,
       );
 }

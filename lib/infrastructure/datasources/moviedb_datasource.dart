@@ -1,23 +1,24 @@
 import 'package:dio/dio.dart';
 
 import 'package:cinemapedia/config/constants/environment.dart';
-import 'package:cinemapedia/domain/domain.dart' show Movie, MoviesDatasource;
-import 'package:cinemapedia/infrastructure/infrastructure.dart'
-    show MovieDBResponse, MovieDetails, MovieMapper;
+import 'package:cinemapedia/domain/datasources/movies_datasource.dart';
+import 'package:cinemapedia/infrastructure/models/models.dart';
+import 'package:cinemapedia/infrastructure/mappers/mappers.dart';
+import 'package:cinemapedia/domain/entities/entities.dart';
 
 class MovieDBDatasource extends MoviesDatasource {
   final dio = Dio(
     BaseOptions(
       baseUrl: 'https://api.themoviedb.org/3',
       queryParameters: {
-        'api_key': Environment.theMovieDBKey,
-        'language': 'es-MX'
+        'api_key': Environment.theMovieDbKey,
+        'language': 'es-MX',
       },
     ),
   );
 
   List<Movie> _jsonToMovies(Map<String, dynamic> json) {
-    final movieDBResponse = MovieDBResponse.fromJson(json);
+    final movieDBResponse = MovieDbResponse.fromJson(json);
 
     final List<Movie> movies = movieDBResponse.results
         .where((movieDB) => movieDB.posterPath != 'no-poster')
@@ -31,7 +32,9 @@ class MovieDBDatasource extends MoviesDatasource {
   Future<List<Movie>> getNowPlaying({int page = 1}) async {
     final response = await dio.get(
       '/movie/now_playing',
-      queryParameters: {'page': page},
+      queryParameters: {
+        'page': page,
+      },
     );
 
     return _jsonToMovies(response.data);
@@ -41,7 +44,9 @@ class MovieDBDatasource extends MoviesDatasource {
   Future<List<Movie>> getPopular({int page = 1}) async {
     final response = await dio.get(
       '/movie/popular',
-      queryParameters: {'page': page},
+      queryParameters: {
+        'page': page,
+      },
     );
 
     return _jsonToMovies(response.data);
@@ -51,7 +56,9 @@ class MovieDBDatasource extends MoviesDatasource {
   Future<List<Movie>> getTopRated({int page = 1}) async {
     final response = await dio.get(
       '/movie/top_rated',
-      queryParameters: {'page': page},
+      queryParameters: {
+        'page': page,
+      },
     );
 
     return _jsonToMovies(response.data);
@@ -61,7 +68,9 @@ class MovieDBDatasource extends MoviesDatasource {
   Future<List<Movie>> getUpcoming({int page = 1}) async {
     final response = await dio.get(
       '/movie/upcoming',
-      queryParameters: {'page': page},
+      queryParameters: {
+        'page': page,
+      },
     );
 
     return _jsonToMovies(response.data);
@@ -72,12 +81,11 @@ class MovieDBDatasource extends MoviesDatasource {
     final response = await dio.get('/movie/$id');
 
     if (response.statusCode != 200) {
-      throw Exception('Movie with id $id not found');
+      throw Exception('Movie with id: $id not found');
     }
 
     final movieDetails = MovieDetails.fromJson(response.data);
     final Movie movie = MovieMapper.movieDetailsToEntity(movieDetails);
-
     return movie;
   }
 
@@ -87,9 +95,33 @@ class MovieDBDatasource extends MoviesDatasource {
 
     final response = await dio.get(
       '/search/movie',
-      queryParameters: {'query': query},
+      queryParameters: {
+        'query': query,
+      },
     );
 
     return _jsonToMovies(response.data);
+  }
+
+  @override
+  Future<List<Movie>> getSimilarMovies(int movieId) async {
+    final response = await dio.get('/movie/$movieId/similar');
+    return _jsonToMovies(response.data);
+  }
+
+  @override
+  Future<List<Video>> getYoutubeVideosById(int movieId) async {
+    final response = await dio.get('/movie/$movieId/videos');
+    final movieDBVideosResponse = MovieDBVideosResponse.fromJson(response.data);
+    final videos = <Video>[];
+
+    for (final movieDBVideo in movieDBVideosResponse.results) {
+      if (movieDBVideo.site == 'YouTube') {
+        final video = VideoMapper.movieDBVideoToEntity(movieDBVideo);
+        videos.add(video);
+      }
+    }
+
+    return videos;
   }
 }

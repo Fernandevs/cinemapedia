@@ -1,44 +1,64 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/domain/repositories/local_storage_repository.dart';
-import 'package:cinemapedia/presentation/providers/storage/local_storage_provider.dart';
+import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cinemapedia/domain/entities/movie.dart';
 
-final favoriteMoviesProvider =
-    StateNotifierProvider<StorageMovieNotifier, Map<int, Movie>>((ref) {
-  final repository = ref.watch(localStorageRepositoryProvider);
-  return StorageMovieNotifier(repository: repository);
+
+
+final favoriteMoviesProvider = StateNotifierProvider<StorageMoviesNotifier,Map<int,Movie>>((ref) {
+  final localStorageRepository = ref.watch( localStorageRepositoryProvider );
+  return StorageMoviesNotifier(localStorageRepository: localStorageRepository);
 });
 
-class StorageMovieNotifier extends StateNotifier<Map<int, Movie>> {
-  final LocalStorageRepository repository;
-  int page = 0;
 
-  StorageMovieNotifier({required this.repository}) : super({});
+/*
+  {
+    1234: Movie,
+    1645: Movie,
+    6523: Movie,
+  }
+
+*/
+
+class StorageMoviesNotifier extends StateNotifier<Map<int, Movie>> {
+  
+  int page = 0;
+  final LocalStorageRepository localStorageRepository;
+
+  StorageMoviesNotifier({
+    required this.localStorageRepository
+  }): super({});
+
 
   Future<List<Movie>> loadNextPage() async {
-    final movies = await repository.loadMovies(offset: page * 10, limit: 20);
-    final aux = <int, Movie>{};
+    final movies = await localStorageRepository.loadMovies(offset: page * 10, limit: 20);
     page++;
-
-    for (final movie in movies) {
-      aux[movie.id] = movie;
+    
+    final tempMoviesMap = <int, Movie>{};
+    for( final movie in movies ) {
+      tempMoviesMap[movie.id] = movie;
     }
 
-    state = {...state, ...aux};
+    state = { ...state, ...tempMoviesMap };
 
     return movies;
   }
 
-  Future<void> toggleFavorite(Movie movie) async {
-    await repository.toggleFavorite(movie);
+  Future<void> toggleFavorite( Movie movie ) async { 
+    await localStorageRepository.toggleFavorite(movie);
     final bool isMovieInFavorites = state[movie.id] != null;
 
-    if (isMovieInFavorites) {
+    if ( isMovieInFavorites ) {
       state.remove(movie.id);
-      state = {...state};
+      state = { ...state };
     } else {
-      state = {...state, movie.id: movie};
+      state = { ...state, movie.id: movie };
     }
+
   }
+
+
+
+
 }
+

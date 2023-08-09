@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cinemapedia/presentation/screens/screens.dart';
 
@@ -8,18 +7,20 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/home/:page',
       name: HomeScreen.name,
-      builder: (BuildContext context, GoRouterState state) {
-        final int index = int.parse(state.pathParameters['page'] ?? '0');
+      builder: (context, state) {
+        final pageIndex = int.parse(state.pathParameters['page'] ?? '0');
 
-        return HomeScreen(index: index);
+        return HomeScreen(pageIndex: pageIndex);
       },
       routes: <GoRoute>[
         GoRoute(
           path: 'movie/:id',
           name: MovieScreen.name,
-          builder: (context, state) => MovieScreen(
-            id: state.pathParameters['id'] ?? 'no-id',
-          ),
+          builder: (context, state) {
+            final movieId = state.pathParameters['id'] ?? 'no-id';
+
+            return MovieScreen(movieId: movieId);
+          },
         ),
       ],
     ),
